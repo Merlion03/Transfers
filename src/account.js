@@ -40,7 +40,6 @@ function Account() {
         checkVotingStatus();
     });
     
-
     useEffect(()=> {
         console.log(patternId);
         const {callback} = patternId;
@@ -220,16 +219,16 @@ function Account() {
         </form>
 
 
-		<h3>Выдвижение пользователя в админы</h3>
-        {votingStatus ? <>Проводится голосование по пользователю {addressToBoost}</>: <>Сейчас не проводится никаких голосований</>}
-		<form onSubmit={createBoostOffer}>
-			<input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
-			<button id="boost">Выдвинуть</button><br/>
-		</form>
-		<form onSubmit={voting}>
-			<button id="yes"  value="yes" onClick={(e)=>setVote(e.target.value)}>За</button>
-            <button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button><br/>
-		</form>
+	<h3>Выдвижение пользователя в админы</h3>
+	{votingStatus ? <>Проводится голосование по пользователю {addressToBoost}</>: <>Сейчас не проводится никаких голосований</>}
+	<form onSubmit={createBoostOffer}>
+		<input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
+		<button id="boost">Выдвинуть</button><br/>
+	</form>
+	<form onSubmit={voting}>
+		<button id="yes"  value="yes" onClick={(e)=>setVote(e.target.value)}>За</button>
+		<button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button><br/>
+	</form>
     </>)
 }
 
