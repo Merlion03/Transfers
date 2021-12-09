@@ -20,7 +20,6 @@ function Account() {
     const [addressToBoost, setAddressToBoost] = useState();
     const [votingStatus, setVotingStatus] = useState();
     const [vote, setVote] = useState();
-    let isLogOut = 0;
 
     useEffect(() => {
         async function listPatterns() {
@@ -37,10 +36,8 @@ function Account() {
         listPatterns();
 
         getBalance();
-        if (isLogOut == 0) {
-            checkVotingStatus();
-            isLogOut = 1;
-        }
+
+        checkVotingStatus();
     });
     
 
@@ -119,25 +116,23 @@ function Account() {
     }
 
     async function checkVotingStatus() {
-        if (isLogOut){
-            const status = await Contract.methods.checkBoostOffer().call();
-            setVotingStatus(status);
-            if (status) {
-                document.getElementById("addressToBoost").disabled = true;
-                document.getElementById("boost").disabled = true;
-                document.getElementById("yes").style.visibility = "visible";
-                document.getElementById("no").style.visibility = "visible";
-                const addressToBoost = await Contract.methods.getAddressTooBoost().call()
-                setAddressToBoost(addressToBoost);
-            }
-            else {
-                document.getElementById("addressToBoost").disabled = false;
-                document.getElementById("boost").disabled = false;
-                document.getElementById("yes").style.visibility = "hidden";
-                document.getElementById("no").style.visibility = "hidden";
-            }
-        return status;
+        const status = await Contract.methods.checkBoostOffer().call();
+        setVotingStatus(status);
+        if (status) {
+            document.getElementById("addressToBoost").disabled = true;
+            document.getElementById("boost").disabled = true;
+            document.getElementById("yes").style.visibility = "visible";
+            document.getElementById("no").style.visibility = "visible";
+            const addressToBoost = await Contract.methods.getAddressTooBoost().call()
+            setAddressToBoost(addressToBoost);
         }
+        else {
+            document.getElementById("addressToBoost").disabled = false;
+            document.getElementById("boost").disabled = false;
+            document.getElementById("yes").style.visibility = "hidden";
+            document.getElementById("no").style.visibility = "hidden";
+        }
+    return status;
     }
 
     async function createBoostOffer(e) {
