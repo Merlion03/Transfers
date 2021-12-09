@@ -1,3 +1,4 @@
 # Transfers
-src - Frontend Maxim's `\n`
-src2 - Frontend Anton's
+src - Maxim's front
+
+src2 - Anton's front
