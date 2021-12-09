@@ -12,7 +12,6 @@ function Main() {
     const [password, setPassword] = useState();
     const [Accounts, setAccounts] = useState([]);
 
-
     useEffect(() => {
         listAccounts()
     });
