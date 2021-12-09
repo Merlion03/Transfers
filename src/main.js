@@ -67,7 +67,7 @@ function Main() {
         <h3>Авторизация</h3>
         <form onSubmit={logIn}>
             <select onChange={(e)=>setAddress(e.target.value)}>
-                {Accounts.map((arr, i)=><option key={i} value={String(arr)}>{arr}</option>)}
+                {Accounts.map((addr, i)=><option key={i} value={String(addr)}>{addr}</option>)}
             </select>
             <input required type="password" placeholder="Пароль" onChange={(e)=>setPassword(e.target.value)}/>
             <button>Войти</button>
