@@ -14,7 +14,7 @@ contract Transfers {
     uint public adminsNum;
     
     constructor() {
-         users[0x350E67c63aAE498430DF311680b084A84E3D7C25] = User("1", true);
+        users[0x350E67c63aAE498430DF311680b084A84E3D7C25] = User("1", true);
         users[0xF5D653C84A39DFE9BFFe6ccBCFA237c4F7C9ce41] = User("2", true);
         users[0x0e4310516aE847A94aE2dBF71D1681B39e487030] = User("3", false);
         users[0xA618381cc1eb2344FAeb1518d980AEac02bB312B] = User("4", false);
