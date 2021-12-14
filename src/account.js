@@ -12,39 +12,28 @@ function Account() {
     const [categoryId, setCategoryId] = useState();
     const [description, setDescription] = useState();
     const [transferId, setTransferId] = useState();
-    const [patternId, setPatternId] = useState({val:-1, callback: null});
-    const [patterns, setPatterns] = useState([]);
-    const [patternValues, setPatternValues] = useState([]);
     const address = sessionStorage.getItem("address");
     const [balance, setBalance] = useState();
     const [addressToBoost, setAddressToBoost] = useState();
     const [votingStatus, setVotingStatus] = useState();
     const [vote, setVote] = useState();
+    const [voted, setVoted] = useState();
+    const [admin, setAdmin] = useState();
+    const [categoryName, setCategoryName] = useState();
+    const [patternName, setPatternName] = useState();
+    const [patternValue, setPatternValue] = useState();
 
     useEffect(() => {
-        async function listPatterns() {
-            let Patterns = await Contract.methods.getPatterns().call();
-            let patternNames = new Set();
-            for (let i in Patterns) {
-                patternNames.add((i, Patterns[i][0]));
-            }
-            patternNames = Array.from(patternNames);
-            patternNames.splice(0, 0, "Шаблон не выбран");
-            setPatterns(patternNames);
+
+        async function isAdmin() {
+            let admin = await Contract.methods.isAdmin().call({from: address});
+            setAdmin(admin);
         }
-        
-        listPatterns();
 
+        isAdmin();
         getBalance();
-
         checkVotingStatus();
-    });
-    
-    useEffect(()=> {
-        console.log(patternId);
-        const {callback} = patternId;
-        callback && callback();
-    }, [patternId]);
+    }, []);
 
     async function logOut() {
         web3.eth.personal.lockAccount(address);
@@ -52,66 +41,54 @@ function Account() {
         history.push('/main');
     }
 
-    async function getBalance(addr) {
+    async function getBalance() {
         let balance = await Contract.methods.getBalance(address).call() / 10**18;
         setBalance(balance);
+    }
+
+    async function isVoted() {
+        let voted = await Contract.methods.isVoted().call({from: address});
+        setVoted(voted);
     }
 
     async function createTransfer(e) {
         e.preventDefault();
         try {
-            if (patternId === -1) {
-                await Contract.methods.createTransfer(addressTo, codeword, categoryId, description).send({from: address, value: value});
-            }
-            else {
-                await Contract.methods.usePattern(patternId, addressTo, codeword, description).send({from: address, value: value});
-            }
+            await Contract.methods.createTransfer(addressTo, codeword, categoryId, description).send({from: address, value: value});
             const transferId = await Contract.methods.getTransferID().call();
-            e.target.reset();
             getBalance();
             alert(`ID перевода: ${transferId}.`);
         }
         catch(e) {
             alert(e);
         }
+        e.target.reset();
     }
 
     async function confirmTransfer(e) {
         e.preventDefault();
         try {
             await Contract.methods.confirmTransfer(transferId, codeword).send({from: address});
-            e.target.reset();
             getBalance();
             alert('Перевод принят.');
         }
         catch(e) {
             alert(e);
         }
+        e.target.reset();
     }
 
     async function cancelTransfer(e) {
         e.preventDefault();
         try {
             await Contract.methods.cancelTransfer(transferId).send({from: address});
-            e.target.reset();
             getBalance();
             alert('Перевод отменён.');
         }
         catch(e) {
             alert(e);
         }
-    }
-
-    async function getPatternValues() {
-        let Patterns = await Contract.methods.getPatterns().call();
-        let patternValues = [];
-        console.log(patternId["val"])
-        for (let i in Patterns) {
-            if (Patterns[i][0] === patterns[patternId["val"]+1]) {
-                patternValues.push((Patterns[i][2]));
-            }
-        }
-        setPatternValues(patternValues);
+        e.target.reset();
     }
 
     async function checkVotingStatus() {
@@ -121,6 +98,7 @@ function Account() {
             setAddressToBoost(addressToBoost);
         }
         setVotingStatus(status);
+        isVoted();
         return status;
     }
 
@@ -129,16 +107,16 @@ function Account() {
 		try{
 			await Contract.methods.createBoostOffer(addressToBoost).send({from: address});
             checkVotingStatus();
-			e.target.reset();
 			alert('Пользователь добавлен на голосование.');
-		} catch(e) {
+		} 
+        catch(e) {
 			alert(e);
 		}
+        e.target.reset();
 	}
 
     async function voting(e) {
         e.preventDefault();
-        console.log(vote);
         try {
             if (vote === "yes") {
                 await Contract.methods.voteYes().send({from: address});
@@ -149,7 +127,6 @@ function Account() {
                 alert('Вы проголосовали "Против"');
             }
             const status = checkVotingStatus();
-            console.log(status);
             if (!status) {
                 alert("Голосование окончено.");
             }
@@ -159,10 +136,30 @@ function Account() {
         }
     }
 
-    function test(e) {
+    async function createCategory(e) {
         e.preventDefault();
-        console.log(patternId)
-        console.log(patternValues)
+        try{
+            await Contract.methods.createCategory(categoryName).send({from: address});
+        }
+        catch(e) {
+            alert(e);
+        }
+        const categoryId = await Contract.methods.getCategoryId().call();
+        alert(`Категория создана.\nid категории: ${categoryId}`);
+        e.target.reset();
+    }
+
+    async function createPattern(e) {
+        e.preventDefault();
+        try{
+            await Contract.methods.createPattern(patternName, categoryId, patternValue).send({from: address});
+        }
+        catch(e) {
+            alert(e);
+        }
+        const patternId = await Contract.methods.getPatternId().call();
+        alert(`Шаблон создан.\nid шаблона: ${patternId}`);
+        e.target.reset();
     }
 
     return(<>
@@ -173,57 +170,66 @@ function Account() {
         
 
         <h3>Переводы</h3>
-        <p>Создать перевод</p>
+        Создать перевод
         <form onSubmit={createTransfer}>
-            <select onChange={(e) => setPatternId({val:e.target.value-1, callback: ()=>getPatternValues()})}>
-                {patterns.map((name, i)=><option key={i} value={i}>{name}</option>)}
-            </select><br/>
-            {
-                patternId["val"] === -1 ? null:
-                <>Сумма: 
-                {patternValues.map((value, i)=><button key={i} type="button" value={i}>{value/10**18} ETH</button>)}<br/></>
-            }
             <input required placeholder="Адрес" onChange={(e)=>setAddressTo(e.target.value)}/><br/>
-            {patternId["val"] === -1 ?  <><input required placeholder="Сумма" onChange={(e)=>setValue(e.target.value)}/><br/></>: null}
+            <input required placeholder="Сумма" onChange={(e)=>setValue(e.target.value)}/><br/>
             <input required type="password" placeholder="Кодовое слово" onChange={(e)=>setCodeword(e.target.value)}/><br/>
-            {patternId["val"] === -1 ? <><input required placeholder="id категории" onChange={(e) => setCategoryId(e.target.value)} /><br /></> : null}
+            <input required placeholder="id категории" onChange={(e) => setCategoryId(e.target.value)} /><br />
             <input placeholder="Описание" onChange={(e)=>setDescription(e.target.value)}/><br/>
             <button>Отправить</button><br/>
-        </form>
+        </form><br/>
 
-        <p>Принять перевод</p>
+        Принять перевод
         <form onSubmit={confirmTransfer}>
             <input required placeholder="id перевода" onChange={(e)=>setTransferId(e.target.value)}/><br/>
             <input required type="password" placeholder="Кодовое слово" onChange={(e)=>setCodeword(e.target.value)}/><br/>
             <button>Принять</button><br/>
-        </form>
+        </form><br/>
 
-        <p>Отменить перевод</p>
+        Отменить перевод
         <form onSubmit={cancelTransfer}>
             <input required placeholder="id перевода" onChange={(e)=>setTransferId(e.target.value)}/><br/>
             <button>Отменить</button><br/>
         </form>
 
-        <form onSubmit={test}>
-            <button>patternId</button>
-        </form>
-
-
-        <h3>Голосование по добавлению администратора</h3>
         {
-            votingStatus ? <>Проводится голосование по пользователю {addressToBoost}<br/>
-                <form onSubmit={voting}>
-                    <button id="yes"  value="yes" onClick={(e)=>setVote(e.target.value)}>За</button>
-                    <button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button><br/>
+            admin ? <>
+                <h3> Панель администратора</h3>
+                {
+                    votingStatus ? <>Проводится голосование по назначению администратором пользователя <br/>{addressToBoost}<br/>
+                        {
+                            voted ? <>Вы уже проголосовали<br/><br/></>:
+                            <>
+                                <form onSubmit={voting}>
+                                <button id="yes"  value="yes" onClick={(e)=>setVote(e.target.value)}>За</button>
+                                <button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button><br/>
+                                </form><br/>
+                            </>
+                        }
+                    </>: 
+                    <>Голосование по назначению администратора сейчас не проводится<br/>
+                        <form onSubmit={createBoostOffer}>
+                            <input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
+                            <button id="boost">Выдвинуть</button><br/>
+                        </form><br/>
+                    </>
+                }
+
+                Создать категорию перевода
+                <form onSubmit={createCategory}>
+                    <input required placeholder='Название' onChange={(e)=>setCategoryName(e.target.value)}/>
+                    <button>Создать</button>
+                </form><br/>
+
+                Создать шаблон перевода
+                <form onSubmit={createPattern}>
+                    <input required placeholder='Название' onChange={(e)=>setPatternName(e.target.value)}/><br/>
+                    <input required placeholder='id категории' onChange={(e)=>setCategoryId(e.target.value)}/><br/>
+                    <input required placeholder='Сумма' onChange={(e)=>setPatternValue(e.target.value)}/><br/>
+                    <button>Создать</button>
                 </form>
-            </>: 
-        
-            <>Сейчас не проводится никаких голосований<br/>
-                <form onSubmit={createBoostOffer}>
-                    <input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
-                    <button id="boost">Выдвинуть</button><br/>
-                </form>
-            </>
+            </>: null
         }
     </>)
 }
