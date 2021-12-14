@@ -167,7 +167,6 @@ function Account() {
             <button onClick={logOut}>Выйти</button>
         </p>
         
-
         <h3>Переводы</h3>
         Создать перевод
         <form onSubmit={createTransfer}>
