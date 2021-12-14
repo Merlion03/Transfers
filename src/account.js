@@ -116,22 +116,12 @@ function Account() {
 
     async function checkVotingStatus() {
         const status = await Contract.methods.checkBoostOffer().call();
-        setVotingStatus(status);
         if (status) {
-            document.getElementById("addressToBoost").disabled = true;
-            document.getElementById("boost").disabled = true;
-            document.getElementById("yes").style.visibility = "visible";
-            document.getElementById("no").style.visibility = "visible";
-            const addressToBoost = await Contract.methods.getAddressTooBoost().call()
+            const addressToBoost = await Contract.methods.getAddressTooBoost().call();
             setAddressToBoost(addressToBoost);
         }
-        else {
-            document.getElementById("addressToBoost").disabled = false;
-            document.getElementById("boost").disabled = false;
-            document.getElementById("yes").style.visibility = "hidden";
-            document.getElementById("no").style.visibility = "hidden";
-        }
-    return status;
+        setVotingStatus(status);
+        return status;
     }
 
     async function createBoostOffer(e) {
@@ -219,16 +209,22 @@ function Account() {
         </form>
 
 
-	<h3>Выдвижение пользователя в админы</h3>
-	{votingStatus ? <>Проводится голосование по пользователю {addressToBoost}</>: <>Сейчас не проводится никаких голосований</>}
-	<form onSubmit={createBoostOffer}>
-		<input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
-		<button id="boost">Выдвинуть</button><br/>
-	</form>
-	<form onSubmit={voting}>
-		<button id="yes"  value="yes" onClick={(e)=>setVote(e.target.value)}>За</button>
-		<button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button><br/>
-	</form>
+        <h3>Выдвижение пользователя в админы</h3>
+        {
+            votingStatus ? <>Проводится голосование по пользователю {addressToBoost}<br/>
+                <form onSubmit={voting}>
+                    <button id="yes"  value="yes" onClick={(e)=>setVote(e.target.value)}>За</button>
+                    <button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button><br/>
+                </form>
+            </>: 
+        
+            <>Сейчас не проводится никаких голосований<br/>
+                <form onSubmit={createBoostOffer}>
+                    <input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
+                    <button id="boost">Выдвинуть</button><br/>
+                </form>
+            </>
+        }
     </>)
 }
 
