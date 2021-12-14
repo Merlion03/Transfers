@@ -25,6 +25,19 @@ export const ABI = [
 	},
 	{
 		"inputs": [],
+		"name": "adminsNum",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "boostOffer",
 		"outputs": [
 			{
@@ -256,6 +269,19 @@ export const ABI = [
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "getCategoryId",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "string",
@@ -276,29 +302,12 @@ export const ABI = [
 	},
 	{
 		"inputs": [],
-		"name": "getPatterns",
+		"name": "getPatternId",
 		"outputs": [
 			{
-				"components": [
-					{
-						"internalType": "string",
-						"name": "name",
-						"type": "string"
-					},
-					{
-						"internalType": "uint256",
-						"name": "categoryId",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "value",
-						"type": "uint256"
-					}
-				],
-				"internalType": "struct Transfers.Pattern[]",
+				"internalType": "uint256",
 				"name": "",
-				"type": "tuple[]"
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -312,6 +321,87 @@ export const ABI = [
 				"internalType": "uint256",
 				"name": "",
 				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getTransfers",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "fromAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "toAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "value",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "codewordHash",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "uint256",
+						"name": "categoryId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "time",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "status",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct Transfers.Transfer[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "isAdmin",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "isVoted",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
@@ -393,7 +483,7 @@ export const ABI = [
 			},
 			{
 				"internalType": "bool",
-				"name": "finished",
+				"name": "status",
 				"type": "bool"
 			}
 		],

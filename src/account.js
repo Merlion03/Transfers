@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import { UseContext } from './context';
+import {useState, useEffect} from 'react';
+import {UseContext} from './context';
 import {useHistory} from 'react-router-dom';
 import './index.css';
 
@@ -32,7 +32,7 @@ function Account() {
         isAdmin();
         getBalance();
         checkVotingStatus();
-    }, []);
+    });
 
     async function logOut() {
         web3.eth.personal.lockAccount(address);
@@ -88,6 +88,27 @@ function Account() {
             alert(e);
         }
         e.target.reset();
+    }
+
+    async function getTransfers(e) {
+        e.preventDefault();
+        try {
+            const transfers = await Contract.methods.getTransfers().call();
+            console.log(transfers);
+            let userTransfers = [];
+            for (let i in transfers) {
+                if (transfers[i]["fromAddress"] === address && transfers[i]["time"] !== "0") {
+                    userTransfers.push(transfers[i]);
+                }
+                else if (transfers[i]["toAddress"] === address && transfers[i]["time"] !== "0") {
+                    userTransfers.push(transfers[i]);
+                }
+            }
+            console.log(userTransfers);
+        }
+        catch(e) {
+            alert(e);
+        }
     }
 
     async function checkVotingStatus() {
@@ -175,20 +196,24 @@ function Account() {
             <input required type="password" placeholder="Кодовое слово" onChange={(e)=>setCodeword(e.target.value)}/><br/>
             <input required placeholder="id категории" onChange={(e) => setCategoryId(e.target.value)} /><br />
             <input placeholder="Описание" onChange={(e)=>setDescription(e.target.value)}/><br/>
-            <button>Отправить</button><br/>
+            <button>Отправить</button>
         </form><br/>
 
         Принять перевод
         <form onSubmit={confirmTransfer}>
             <input required placeholder="id перевода" onChange={(e)=>setTransferId(e.target.value)}/><br/>
             <input required type="password" placeholder="Кодовое слово" onChange={(e)=>setCodeword(e.target.value)}/><br/>
-            <button>Принять</button><br/>
+            <button>Принять</button>
         </form><br/>
 
         Отменить перевод
         <form onSubmit={cancelTransfer}>
             <input required placeholder="id перевода" onChange={(e)=>setTransferId(e.target.value)}/><br/>
-            <button>Отменить</button><br/>
+            <button>Отменить</button>
+        </form><br/>
+
+        <form onSubmit={getTransfers}>
+            <button>Получить переводы</button>
         </form>
 
         {
@@ -201,15 +226,15 @@ function Account() {
                             <>
                                 <form onSubmit={voting}>
                                 <button id="yes"  value="yes" onClick={(e)=>setVote(e.target.value)}>За</button>
-                                <button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button><br/>
+                                <button id="no"  value="no" onClick={(e)=>setVote(e.target.value)}>Против</button>
                                 </form><br/>
-                            </>
+                            </> 
                         }
                     </>: 
                     <>Голосование по назначению администратора сейчас не проводится<br/>
                         <form onSubmit={createBoostOffer}>
                             <input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
-                            <button id="boost">Выдвинуть</button><br/>
+                            <button id="boost">Выдвинуть</button>
                         </form><br/>
                     </>
                 }

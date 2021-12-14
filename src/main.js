@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import { UseContext } from './context';
+import {useState, useEffect} from 'react';
+import {UseContext} from './context';
 import {useHistory} from 'react-router-dom';
 import './index.css';
 
