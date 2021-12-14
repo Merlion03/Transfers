@@ -1,2 +1,4 @@
 # Transfers
-src - Maxim's front
+src - react front
+
+Transfers - contract
