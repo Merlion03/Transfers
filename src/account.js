@@ -24,7 +24,6 @@ function Account() {
     const [patternValue, setPatternValue] = useState();
 
     useEffect(() => {
-
         async function isAdmin() {
             let admin = await Contract.methods.isAdmin().call({from: address});
             setAdmin(admin);
