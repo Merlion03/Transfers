@@ -119,7 +119,7 @@ contract Transfers {
         require(msg.sender != toAddress, "You can't transfer to yourself");
         require(getHash(users[toAddress].login) != getHash(""), "Account not registered");
         require(getHash(categories[categoryId]) != getHash(""), "Category doesn't exist");
-        transfers.push(Transfer(msg.sender, toAddress, msg.value, getHash(codeword), categoryId, description, 0, false));
+        transfers.push(Transfer(msg.sender, toAddress, msg.value, getHash(codeword), categoryId, description, 0, true));
     }
     
     function confirmTransfer(uint transferId, string memory codeword) public payable {
