@@ -209,7 +209,7 @@ function Account() {
         </form>
 
 
-        <h3>Выдвижение пользователя в админы</h3>
+        <h3>Голосование по добавлению администратора</h3>
         {
             votingStatus ? <>Проводится голосование по пользователю {addressToBoost}<br/>
                 <form onSubmit={voting}>
