@@ -41,15 +41,15 @@ contract Transfers {
     }
     
     function getHash(string memory str) public pure returns(bytes32) {
-        return(keccak256(bytes(str)));
+        return keccak256(bytes(str));
     }
     
     function getAddress(string memory login) public view returns(address) {
-        return(addresses[login]);
+        return addresses[login];
     }
 
     function getBalance(address addr) public view returns(uint) {
-        return(addr.balance);
+        return addr.balance;
     }
     
     function createUser(address addr, string memory login) public {
@@ -60,6 +60,10 @@ contract Transfers {
     }
     
     string[] public categories;
+
+    function getCategoryId() public view returns(uint) {
+        return categories.length - 1;
+    }
     
     function createCategory(string memory name) public admin {
         categories.push(name);
@@ -72,6 +76,10 @@ contract Transfers {
     }
     
     Pattern[] public patterns;
+
+    function getPatternId() public view returns(uint) {
+        return patterns.length - 1;
+    }
 
     function getPatterns() public view returns(Pattern[] memory) {
         return patterns;
@@ -103,7 +111,7 @@ contract Transfers {
     Transfer[] public transfers;
 
     function getTransferID() public view returns(uint) {
-        return(transfers.length-1);
+        return transfers.length - 1;
     }
     
     function createTransfer(address toAddress, string memory codeword, uint categoryId, string memory description) public payable {
@@ -140,6 +148,15 @@ contract Transfers {
         require(users[msg.sender].admin, "Not admin");
         _;
     }
+
+    function isAdmin() public view returns(bool) {
+        if (users[msg.sender].admin) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     
     struct BoostOffer {
         address toBoost;
@@ -167,6 +184,15 @@ contract Transfers {
             require(msg.sender != boostOffer.yes[i], "You are already voted");
         }
         _;
+    }
+
+    function isVoted() public view returns(bool) {
+        for (uint i=0; i < boostOffer.yes.length; i++) {
+            if (msg.sender == boostOffer.yes[i]) {
+                return true;
+            }
+        }
+        return false;
     }
     
     function checkBoostOffer() public returns(bool) {
