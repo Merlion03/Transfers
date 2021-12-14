@@ -80,10 +80,6 @@ contract Transfers {
     function getPatternId() public view returns(uint) {
         return patterns.length - 1;
     }
-
-    function getPatterns() public view returns(Pattern[] memory) {
-        return patterns;
-    }
     
     function createPattern(string memory name, uint categoryId, uint value) public admin {
         require(getHash(categories[categoryId]) != getHash(""), "Category doesn't exist");
@@ -112,6 +108,10 @@ contract Transfers {
 
     function getTransferID() public view returns(uint) {
         return transfers.length - 1;
+    }
+
+    function getTransfers() public view returns(Transfer[] memory) {
+        return transfers;
     }
     
     function createTransfer(address toAddress, string memory codeword, uint categoryId, string memory description) public payable {
