@@ -5,30 +5,38 @@ import './index.css';
 
 function Account() {
     const history = useHistory();
+    const address = sessionStorage.getItem("address");
     const {web3, Contract} = UseContext();
+    const [login, setLogin] = useState();
+    const [balance, setBalance] = useState();
+    const [admin, setAdmin] = useState();
     const [addressTo, setAddressTo] = useState();
     const [value, setValue] = useState();
     const [codeword, setCodeword] = useState();
     const [categoryId, setCategoryId] = useState();
     const [description, setDescription] = useState();
     const [transferId, setTransferId] = useState();
-    const address = sessionStorage.getItem("address");
-    const [balance, setBalance] = useState();
+    const [transfers, setTransfers] = useState();
     const [addressToBoost, setAddressToBoost] = useState();
     const [votingStatus, setVotingStatus] = useState();
     const [vote, setVote] = useState();
     const [voted, setVoted] = useState();
-    const [admin, setAdmin] = useState();
     const [categoryName, setCategoryName] = useState();
     const [patternName, setPatternName] = useState();
     const [patternValue, setPatternValue] = useState();
 
     useEffect(() => {
         async function isAdmin() {
-            let admin = await Contract.methods.isAdmin().call({from: address});
+            const admin = await Contract.methods.isAdmin().call({from: address});
             setAdmin(admin);
         }
 
+        async function getLogin() {
+            const user = await Contract.methods.users(address).call();
+            setLogin(user["login"]);
+        }
+
+        getLogin()
         isAdmin();
         getBalance();
         checkVotingStatus();
@@ -94,7 +102,6 @@ function Account() {
         e.preventDefault();
         try {
             const transfers = await Contract.methods.getTransfers().call();
-            console.log(transfers);
             let userTransfers = [];
             for (let i in transfers) {
                 if (transfers[i]["fromAddress"] === address && transfers[i]["time"] !== "0") {
@@ -104,11 +111,27 @@ function Account() {
                     userTransfers.push(transfers[i]);
                 }
             }
-            console.log(userTransfers);
+            formatTransfers(transfers)
         }
         catch(e) {
             alert(e);
         }
+    }
+
+    function formatTransfers(transfers) {
+        console.log(transfers);
+        let formattedTransfers = [];
+        for (let i in transfers) {
+            console.log(i)
+            let transfer = [];
+            for (let j = 0; j < 8; j++) {
+                console.log(transfers[i])
+                transfer = transfer + transfers[i][j] + "\n";
+            }
+            formattedTransfers.push(transfer);
+        }
+        console.log(formattedTransfers);
+        setTransfers(formattedTransfers)
     }
 
     async function checkVotingStatus() {
@@ -183,7 +206,8 @@ function Account() {
     }
 
     return(<>
-        <p>Адрес: {address}<br/>
+        <p>Логин: {login}<br/>
+            Адрес: {address}<br/>
             Баланс: {balance} ETH<br/>
             <button onClick={logOut}>Выйти</button>
         </p>
@@ -213,7 +237,8 @@ function Account() {
         </form><br/>
 
         <form onSubmit={getTransfers}>
-            <button>Получить переводы</button>
+            <button>История переводов</button>
+            {transfers}
         </form>
 
         {
@@ -251,7 +276,7 @@ function Account() {
                     <input required placeholder='id категории' onChange={(e)=>setCategoryId(e.target.value)}/><br/>
                     <input required placeholder='Сумма' onChange={(e)=>setPatternValue(e.target.value)}/><br/>
                     <button>Создать</button>
-                </form>
+                </form><br/>
             </>: null
         }
     </>)
