@@ -16,7 +16,6 @@ function Account() {
     const [categoryId, setCategoryId] = useState();
     const [description, setDescription] = useState();
     const [transferId, setTransferId] = useState();
-    const [transfers, setTransfers] = useState();
     const [addressToBoost, setAddressToBoost] = useState();
     const [votingStatus, setVotingStatus] = useState();
     const [vote, setVote] = useState();
@@ -96,42 +95,6 @@ function Account() {
             alert(e);
         }
         e.target.reset();
-    }
-
-    async function getTransfers(e) {
-        e.preventDefault();
-        try {
-            const transfers = await Contract.methods.getTransfers().call();
-            let userTransfers = [];
-            for (let i in transfers) {
-                if (transfers[i]["fromAddress"] === address && transfers[i]["time"] !== "0") {
-                    userTransfers.push(transfers[i]);
-                }
-                else if (transfers[i]["toAddress"] === address && transfers[i]["time"] !== "0") {
-                    userTransfers.push(transfers[i]);
-                }
-            }
-            formatTransfers(transfers)
-        }
-        catch(e) {
-            alert(e);
-        }
-    }
-
-    function formatTransfers(transfers) {
-        console.log(transfers);
-        let formattedTransfers = [];
-        for (let i in transfers) {
-            console.log(i)
-            let transfer = [];
-            for (let j = 0; j < 8; j++) {
-                console.log(transfers[i])
-                transfer = transfer + transfers[i][j] + "\n";
-            }
-            formattedTransfers.push(transfer);
-        }
-        console.log(formattedTransfers);
-        setTransfers(formattedTransfers)
     }
 
     async function checkVotingStatus() {
@@ -235,11 +198,6 @@ function Account() {
             <input required placeholder="id перевода" onChange={(e)=>setTransferId(e.target.value)}/><br/>
             <button>Отменить</button>
         </form><br/>
-
-        <form onSubmit={getTransfers}>
-            <button>История переводов</button>
-            {transfers}
-        </form>
 
         {
             admin ? <>
