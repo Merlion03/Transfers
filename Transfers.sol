@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 contract Transfers {
     struct User {
         string login;
+        bytes32 passwordHash;
         bool admin;
     }
     
@@ -14,18 +15,18 @@ contract Transfers {
     uint public adminsNum;
     
     constructor() {
-        users[0x350E67c63aAE498430DF311680b084A84E3D7C25] = User("1", true);
-        users[0xF5D653C84A39DFE9BFFe6ccBCFA237c4F7C9ce41] = User("2", true);
-        users[0x0e4310516aE847A94aE2dBF71D1681B39e487030] = User("3", false);
-        users[0xA618381cc1eb2344FAeb1518d980AEac02bB312B] = User("4", false);
-        users[0x6Be283ae96a0A01825bDbB9AdC57354FBAd947D9] = User("5", false);
-        users[0xdDDc972610d6767A98aE0333f869f11ea8655362] = User("6", false);
-        addresses["1"] = 0x350E67c63aAE498430DF311680b084A84E3D7C25;
-        addresses["2"] = 0xF5D653C84A39DFE9BFFe6ccBCFA237c4F7C9ce41;
-        addresses["3"] = 0x0e4310516aE847A94aE2dBF71D1681B39e487030;
-        addresses["4"] = 0xA618381cc1eb2344FAeb1518d980AEac02bB312B;
-        addresses["5"] = 0x6Be283ae96a0A01825bDbB9AdC57354FBAd947D9;
-        addresses["6"] = 0xdDDc972610d6767A98aE0333f869f11ea8655362;
+        users[0x794d3bA7A1964508864BF5846a70F6E59BB0Cf50] = User("1", getHash("123"), true);
+        users[0xbA3fa41792b14dA93b7BD71b39A1491f131389Ea] = User("2", getHash("123"), true);
+        users[0xff1D95a6931B9AB1304776C2D637B582a04e75Ed] = User("3", getHash("123"), false);
+        users[0xEb1dae9e4a6fAEFa7a6fc0D97C6bE0Aa9E369DB9] = User("4", getHash("123"), false);
+        users[0xA0D179f84F25450eaCEF5f7B54E71149137F1a43] = User("5", getHash("123"), false);
+        users[0x17d14B1F8cEad63bD827E7a5bB40E195E260Edf4] = User("6", getHash("123"), false);
+        addresses["1"] = 0x794d3bA7A1964508864BF5846a70F6E59BB0Cf50;
+        addresses["2"] = 0xbA3fa41792b14dA93b7BD71b39A1491f131389Ea;
+        addresses["3"] = 0xff1D95a6931B9AB1304776C2D637B582a04e75Ed;
+        addresses["4"] = 0xEb1dae9e4a6fAEFa7a6fc0D97C6bE0Aa9E369DB9;
+        addresses["5"] = 0xA0D179f84F25450eaCEF5f7B54E71149137F1a43;
+        addresses["6"] = 0x17d14B1F8cEad63bD827E7a5bB40E195E260Edf4;
         adminsNum = 2;
         
         categories.push("Lichniy perevod");
@@ -41,21 +42,17 @@ contract Transfers {
     }
     
     function getHash(string memory str) public pure returns(bytes32) {
-        return keccak256(bytes(str));
-    }
-    
-    function getAddress(string memory login) public view returns(address) {
-        return addresses[login];
+        return keccak256(abi.encodePacked(str));
     }
 
     function getBalance(address addr) public view returns(uint) {
         return addr.balance;
     }
     
-    function createUser(address addr, string memory login) public {
-        require(msg.sender == 0x3298Dd4C3Ccd949F9F636DDeB31Baf8B9cC7Dc62, "Not a zero account");
+    function createUser(address addr, string memory password, string memory login) public {
+        require(msg.sender == 0x0B041CB4904B6AFC06AeaE63cF1Da9B79226258c, "Not a zero account");
         require(addresses[login] == address(0), "Account with this login already exists");
-        users[addr] = User(login, false);
+        users[addr] = User(login, getHash(password), false);
         addresses[login] = addr;
     }
     
@@ -109,10 +106,6 @@ contract Transfers {
     function getTransferID() public view returns(uint) {
         return transfers.length - 1;
     }
-
-    function getTransfers() public view returns(Transfer[] memory) {
-        return transfers;
-    }
     
     function createTransfer(address toAddress, string memory codeword, uint categoryId, string memory description) public payable {
         require(msg.value > 0, "Invalid value");
@@ -153,9 +146,7 @@ contract Transfers {
         if (users[msg.sender].admin) {
             return true;
         }
-        else {
-            return false;
-        }
+        return false;
     }
     
     struct BoostOffer {
