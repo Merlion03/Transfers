@@ -41,7 +41,7 @@ function Main() {
         const accounts = await web3.eth.getAccounts();
         await web3.eth.personal.unlockAccount(accounts[0], "1");
         try {
-            await Contract.methods.createUser(address, name).send({from: accounts[0]});
+            await Contract.methods.createUser(address, password, name).send({from: accounts[0]});
             await web3.eth.sendTransaction({
                 from: accounts[0],
                 to: address,
