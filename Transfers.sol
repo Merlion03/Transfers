@@ -87,6 +87,7 @@ contract Transfers {
         require(msg.value == patterns[patternId].value, "Invalid value");
         require(msg.sender != toAddress, "You can't transfer to yourself");
         require(getHash(users[toAddress].login) != getHash(""), "Account not registered");
+        require(patternId < patterns.length, "Pattern doesn't exist");
         createTransfer(toAddress, codeword, patterns[patternId].categoryId, description);
     }
     
@@ -111,12 +112,12 @@ contract Transfers {
         require(msg.value > 0, "Invalid value");
         require(msg.sender != toAddress, "You can't transfer to yourself");
         require(getHash(users[toAddress].login) != getHash(""), "Account not registered");
-        require(getHash(categories[categoryId]) != getHash(""), "Category doesn't exist");
+        require(categoryId < categories.length, "Category doesn't exist");
         transfers.push(Transfer(msg.sender, toAddress, msg.value, getHash(codeword), categoryId, description, 0, true));
     }
     
     function confirmTransfer(uint transferId, string memory codeword) public payable {
-        require(transferId < transfers.length, "Invalid id");
+        require(transferId < transfers.length, "Invalid transfer id");
         require(transfers[transferId].status, "Transfer is not active");
         require(msg.sender == transfers[transferId].toAddress, "Not for you");
         if (transfers[transferId].codewordHash == getHash(codeword)) {
@@ -130,7 +131,7 @@ contract Transfers {
     }
     
     function cancelTransfer(uint transferId) public payable {
-        require(transferId < transfers.length, "Invalid id");
+        require(transferId < transfers.length, "Invalid transfer id");
         require(transfers[transferId].status, "Transfer is not active");
         require(msg.sender == transfers[transferId].fromAddress, "Not for you");
         payable(msg.sender).transfer(transfers[transferId].value);
@@ -163,7 +164,7 @@ contract Transfers {
     }
     
     function createBoostOffer(address userAddress) public admin {
-        require(boostOffer.status == false, "Vote is already started");
+        require(boostOffer.status == false, "Voting is already going");
         require(getHash(users[userAddress].login) != getHash(""), "Account not registered");
         require(users[userAddress].admin == false, "Already admin");
         address[] memory yes;
