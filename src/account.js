@@ -105,7 +105,6 @@ function Account() {
         }
         setVotingStatus(status);
         isVoted();
-        return status;
     }
 
     async function createBoostOffer(e) {
@@ -132,7 +131,8 @@ function Account() {
                 await Contract.methods.voteNo().send({from: address});
                 alert('Вы проголосовали "Против"');
             }
-            const status = checkVotingStatus();
+            const status = await Contract.methods.checkBoostOffer().call();
+            console.log(status);
             if (!status) {
                 alert("Голосование окончено.");
             }
@@ -214,7 +214,7 @@ function Account() {
                             </> 
                         }
                     </>: 
-                    <>Голосование по назначению администратора сейчас не проводится<br/>
+                    <>Голосования по назначению администратора сейчас не проводится<br/>
                         <form onSubmit={createBoostOffer}>
                             <input id="addressToBoost" required placeholder="Адрес пользователя" onChange={(e) => setAddressToBoost(e.target.value)}/>
                             <button id="boost">Выдвинуть</button>
