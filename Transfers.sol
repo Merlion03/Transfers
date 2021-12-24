@@ -80,6 +80,7 @@ contract Transfers {
     
     function createPattern(string memory name, uint categoryId, uint value) public admin {
         require(getHash(categories[categoryId]) != getHash(""), "Category doesn't exist");
+        require(value > 0, "Invalid value");
         patterns.push(Pattern(name, categoryId, value));
     }
     
